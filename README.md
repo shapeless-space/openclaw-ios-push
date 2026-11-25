@@ -9,10 +9,12 @@ You can send a message, put your phone away, and get an alert when the reply is 
 - The plugin sends an alert only for **your own** app and web conversations.
 - The plugin does **not** send an alert for:
   - Telegram and other chat channels
-  - heartbeats and scheduled jobs
-  - sub-agents
-  - runs that were cancelled or that failed
+  - heartbeats (the agent's automatic check-ins) and scheduled jobs
+  - sub-agents (work that the agent gives to a helper agent)
+  - turns that you cancel and turns that fail
   - replies with no visible text
+
+A turn is one message and the agent's reply to it.
 - Each iPhone and iPad is **off** until you switch it on.
 - By default, the alert text is **OpenClaw** / **Your reply is ready.** You can change the alert to show the conversation name and the start of the reply.
 
@@ -50,7 +52,7 @@ openclaw plugins install . --force
 
 OpenClaw tells you that the plugin is **not enabled yet**. This is correct, because the plugin needs settings first.
 
-If OpenClaw asks for capability consent, run the same command again and add `--accept-capabilities`.
+If OpenClaw asks you to approve the plugin's capabilities, run the same command again and add `--accept-capabilities`.
 
 ### Step 3: Give the plugin its own identity
 
@@ -59,7 +61,8 @@ The plugin connects to the Gateway with its own paired identity. This identity c
 1. Run `openclaw gateway status`.
 2. Find the line that starts with `CLI version`. The line ends with a path such as `.../node_modules/openclaw/dist/entry.js`.
 3. Change the end of that path from `dist/entry.js` to `openclaw.mjs`. This is your CLI path.
-4. Run the command below. Put your CLI path after `--cli`.
+4. In the command below, put your CLI path after `--cli`.
+5. Run the command.
 
 ```sh
 OPENCLAW_GATEWAY_TOKEN="$(jq -r .gateway.auth.token ~/.openclaw/openclaw.json)" \
@@ -86,7 +89,7 @@ If you choose the wrong profile, the Reply alerts page in step 7 shows a message
 
 ### Step 5: Add the settings
 
-In the command below, replace the three paths and the profile id with your own values. Write full paths. Do not use `~`.
+Replace the three paths and the profile id in the command below with your own values. Write full paths. Do not use `~`.
 
 ```sh
 openclaw config set plugins.entries.ios-reply-alerts.config '{
@@ -158,7 +161,8 @@ To go back to the default alert text, set `"content": "generic"`.
    ```
 
 4. Find the code in the table below.
-5. When you finish, switch off the log: set `logEvidenceShape` to `false`.
+5. When you finish, set `logEvidenceShape` to `false`.
+   > Note: This switches off the troubleshooting log.
 
 The log shows only short codes and field names. It never shows message text.
 
