@@ -16,8 +16,6 @@ A plugin for the [OpenClaw](https://docs.openclaw.ai) Gateway. It sends an alert
 
 A turn is one message and the agent's reply to it.
 
-> **Status:** tested by hand on one Gateway (OpenClaw 2026.11.6) with one iPhone and one iPad, and covered by automated tests. Use it only on a Gateway where one person owns every paired device. Details: [docs/status.md](docs/status.md).
-
 ## Installation guide
 
 ### What you need
@@ -168,6 +166,21 @@ openclaw devices list                            # find the plugin's identity ("
 openclaw devices remove <device id>              # remove that identity
 ```
 
+## Limitations
+
+- **One owner per Gateway.** OpenClaw does not record who owns a paired device, so the plugin treats every paired iPhone and iPad as the configured owner's. Do not use it on a Gateway where other people pair devices.
+- **No "already reading" check.** You get an alert even when the reply is open on your screen.
+- **Re-pairing a device switches it off.** Switch it on again in step 7.
+- **The identity script (step 3) depends on OpenClaw CLI internals.** It may need changes after an OpenClaw update. Do not connect that identity with the shared Gateway token, because that gives it full access again.
+
+## How it works
+
+- OpenClaw reports each finished turn twice, in either order: the `agent_end` hook says where the turn came from, and the lifecycle `end` event says how it ended. The plugin waits for both, up to 120 seconds.
+- The session's owner, or for the shared main session the configured owner, decides which devices get the alert.
+- The plugin sends the alert with the Gateway's `push.test` method, as its own identity.
+- An unclear result (for example a timeout) is recorded and never retried. You may miss an alert, but you never get the same alert twice.
+- Replies that finished before the plugin started, or before you switched a device on, never send an alert.
+
 ## Privacy
 
 - The default alert contains no message text.
@@ -182,8 +195,8 @@ npm install
 npm run verify   # type check, tests, build
 ```
 
-- `src/reply-alerts.ts`: decides whether a run gets an alert. It covers eligibility, per-device consent, the durable record of sent alerts, suppression while you read the reply, and the last check before sending.
-- `src/host/openclaw-adapter.ts`: reads what the Gateway reports. Origin comes from the `agent_end` hook context, the final state from the lifecycle `end` event, and the owner from the session entry.
+- `src/reply-alerts.ts`: decides whether a run gets an alert. It covers eligibility, per-device consent, the durable record of sent alerts, and the last check before sending. It can also skip an alert while you read the reply, but no OpenClaw source for that exists yet.
+- `src/host/openclaw-adapter.ts`: reads what the Gateway reports. Its header comment lists the event and session fields the plugin depends on.
 - `src/host/gateway-cli.ts`, `cli-push-transport.ts`, `cli-device-directory.ts`: call `push.test` and `node.list` as the plugin's own identity.
 - `src/plugin.ts`: wires everything to the Gateway and adds the methods `replyAlerts.devices.list`, `replyAlerts.device.get` and `replyAlerts.device.set`.
 - `dist/control-ui/index.js`: the Reply alerts page, in plain JavaScript with no build step.

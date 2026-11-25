@@ -2,7 +2,7 @@
 // uses (typed hooks, agent event subscriptions, session entry lookup, registerService,
 // registerGatewayMethod, logger) and replaces external I/O (push transport, paired-device directory,
 // viewing presence, clock). Event and entry shapes match what a live OpenClaw 2026.11.6 Gateway
-// (Codex runtime) reported; see docs/status.md.
+// (Codex runtime) reports; see the header of src/host/openclaw-adapter.ts.
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

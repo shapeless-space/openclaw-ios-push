@@ -1,10 +1,11 @@
-// Maps the OpenClaw host's run evidence to the feature's RunSettled facts. Shapes were observed on
-// a live Gateway (OpenClaw 2026.11.6, Codex runtime) on 2026-11-25 with logEvidenceShape:
+// Maps the OpenClaw host's run evidence to the feature's RunSettled facts. The fields below are what
+// OpenClaw 2026.11.6 reports (Codex runtime); `logEvidenceShape` prints them if a release changes them:
 // - origin is only on the `agent_end` hook context: `channel`/`messageProvider`, `trigger`,
 //   optional `inputProvenance.kind`;
 // - terminal facts are on the lifecycle `end` event data: `endedAt`, `aborted`,
 //   `executionSettled`, `stopReason`, `terminalReply.disposition`, `terminalReceipt`;
 // - ownership is on the session entry: `owner.actor` (assigned) or `createdActor` (creator).
+// - `runtime.subagent.waitForRun` fails for chat runs, and agent events carry no origin.
 // Anything missing stays undefined so the policy fails closed.
 import type { RunSettled } from "../reply-alerts.ts";
 

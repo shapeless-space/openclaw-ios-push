@@ -1,5 +1,4 @@
 // OpenClaw plugin entry. Wires the host surfaces the live Gateway provides to the reply-alert feature.
-// See docs/status.md for what has been observed live and what is still open.
 import { ALERT, createReplyAlerts, type DeviceDirectory, type Diagnostic, type PushTransport, type ViewingSource } from "./reply-alerts.ts";
 import { previewAlert, readRunOrigin, toRunSettled, type HostAgentEvent, type RunOrigin } from "./host/openclaw-adapter.ts";
 import { createCliPushTransport } from "./host/cli-push-transport.ts";
