@@ -1,0 +1,30 @@
+{
+  "name": "ios-reply-alerts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "OpenClaw Gateway plugin: opt-in notifications on your iPhone or iPad when a reply in an app or web conversation is ready.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shapeless-space/openclaw-ios-push.git"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "openclaw": {
+    "extensions": [
+      "./src/plugin.ts"
+    ]
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "test": "node --experimental-strip-types --test --test-timeout=10000 \"test/**/*.test.ts\"",
+    "typecheck": "tsc --project tsconfig.json",
+    "verify": "npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "id": "ios-reply-alerts",
+  "name": "iOS reply alerts",
+  "categories": [
+    "other"
+  ],
+  "activation": {
+    "onStartup": true
+  },
+  "controlUi": {
+    "entry": "dist/control-ui/index.js"
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "stateDir",
+      "owner",
+      "gateway"
+    ],
+    "properties": {
+      "stateDir": {
+        "type": "string",
+        "minLength": 1
+      },
+      "owner": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "profileId"
+        ],
+        "properties": {
+          "profileId": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "gateway": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cliPath",
+          "url",
+          "identityDir"
+        ],
+        "properties": {
+          "cliPath": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1
+          },
+          "identityDir": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "logEvidenceShape": {
+        "type": "boolean",
+        "default": false
+      },
+      "alert": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "string",
+            "enum": [
+              "generic",
+              "preview"
+            ],
+            "default": "generic"
+          }
+        }
+      }
+    }
+  },
+  "configGroups": [
+    {
+      "id": "devices",
+      "title": "Devices",
+      "order": 10,
+      "properties": [
+        "owner"
+      ]
+    },
+    {
+      "id": "alerts",
+      "title": "Alerts",
+      "order": 15,
+      "properties": [
+        "alert"
+      ]
+    },
+    {
+      "id": "connection",
+      "title": "Gateway connection",
+      "order": 20,
+      "properties": [
+        "gateway"
+      ]
+    },
+    {
+      "id": "storage",
+      "title": "Storage",
+      "order": 30,
+      "properties": [
+        "stateDir",
+        "logEvidenceShape"
+      ]
+    }
+  ],
+  "uiHints": {
+    "stateDir": {
+      "label": "State directory",
+      "help": "Where consent and the delivery ledger are kept. Must be private to the Gateway.",
+      "advanced": true
+    },
+    "owner.profileId": {
+      "label": "Device owner profile",
+      "help": "The one person who owns every paired iPhone and iPad on this Gateway. Do not use on a Gateway where other people pair devices.",
+      "advanced": false
+    },
+    "gateway.cliPath": {
+      "label": "OpenClaw CLI path",
+      "help": "Path to the OpenClaw CLI entry script used for push.test and node.list.",
+      "advanced": true
+    },
+    "gateway.url": {
+      "label": "Gateway URL",
+      "help": "The local Gateway, loopback ws:// without credentials.",
+      "placeholder": "ws://127.0.0.1:18789",
+      "advanced": true
+    },
+    "gateway.identityDir": {
+      "label": "Plugin CLI identity",
+      "help": "State directory of a CLI identity paired with this Gateway and limited to operator.read and operator.write. Must be private and separate from the Gateway's own state directory.",
+      "advanced": true
+    },
+    "logEvidenceShape": {
+      "label": "Log evidence field names",
+      "help": "Troubleshooting: after each finished run, log the names (never the values) of the fields the Gateway provided.",
+      "advanced": true
+    },
+    "alert.content": {
+      "label": "Alert content",
+      "help": "generic: \"Your reply is ready.\" preview: the conversation's name and the start of the reply. Previews appear on the lock screen and pass through Apple's push service.",
+      "advanced": false
+    }
+  }
+}

@@ -1,0 +1,5 @@
+node_modules/
+*.log
+# Build output; dist/control-ui is hand-written source and stays tracked.
+/dist/*
+!/dist/control-ui/
