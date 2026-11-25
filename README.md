@@ -98,7 +98,7 @@ OpenClaw says where a turn came from (app, web or Telegram) only to plugins that
 ### Step 7: Switch alerts on for your iPhone and iPad
 
 1. Open the Gateway's **Dashboard** in a web browser. Use HTTPS or localhost; plugin pages do not load over plain HTTP on a network address.
-2. Open the **Reply alerts** page. It is hidden at first: add it to the menu with **Customize**.
+2. Open the **Reply alerts** page. It is not in the menu at first. Add it with the Dashboard's menu customization, or pin it.
 3. You will see your iPhone and iPad. Turn on the ones you want.
 
 The OpenClaw iOS app's Settings screen cannot show plugin pages, so use the web Dashboard for this step.

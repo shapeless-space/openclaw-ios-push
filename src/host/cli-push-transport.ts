@@ -1,7 +1,7 @@
-// Push transport over the authenticated OpenClaw CLI: `openclaw gateway call push.test`.
-// This is the background route proven against an isolated Gateway (see docs/status.md): an ordinary
-// external plugin cannot use the trusted in-process gateway request API. The caller must supply a
-// dedicated, least-privilege credential; this module never reads config or credential files.
+// Push transport over the OpenClaw CLI: `openclaw gateway call push.test`. An ordinary external
+// plugin cannot use the trusted in-process gateway request API, so the call runs as the plugin's
+// own paired, scope-limited identity (see gateway-cli.ts). This module never reads config or
+// credential files.
 // push.test targets any node with an APNs registration, so iPhone and iPad nodes share this route.
 import type { PushResult, PushTransport, PushRequest } from "../reply-alerts.ts";
 import { createGatewayCli, type GatewayCliOptions } from "./gateway-cli.ts";

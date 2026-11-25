@@ -86,7 +86,7 @@ function targetDevice(params: Record<string, unknown>, client: GatewayClient | n
   return typeof own === "string" && own.length > 0 ? own : undefined;
 }
 
-/** Top-level field names only, sorted: enough to map an unverified host contract, never a value. */
+/** Top-level field names only, sorted: enough to see which evidence fields the host sent, never a value. */
 const fieldNames = (value: unknown) =>
   typeof value === "object" && value !== null && !Array.isArray(value) ? Object.keys(value).sort().join(",") : "";
 
@@ -221,8 +221,8 @@ export function createReplyAlertsPlugin(deps: PluginDeps) {
         },
       });
 
-      // Called from the device's own connection (a settings toggle), the device is the caller itself;
-      // an explicit deviceId serves owner tooling. Either way the device must belong to the caller.
+      // With an explicit deviceId (the web Dashboard page, which lists the caller's devices) or without
+      // one (a call from the iPhone/iPad's own connection), the device must belong to the caller.
       const methodHandler = (run: (profileId: string | undefined, deviceId: unknown, params: Record<string, unknown>) => Promise<MethodResult>) =>
         async ({ params, client, respond }: GatewayHandlerOptions) => {
           let result: MethodResult;
@@ -252,10 +252,12 @@ export function createReplyAlertsPlugin(deps: PluginDeps) {
 }
 
 /**
- * Installable entry. Config: `{ stateDir, owner: { profileId }, gateway: { cliPath, url, identityDir } }`.
+ * Installable entry. Config: `{ stateDir, owner: { profileId }, gateway: { cliPath, url, identityDir },
+ * alert?: { content: "generic" | "preview" }, logEvidenceShape?: boolean }`.
  * `identityDir` is the OPENCLAW_STATE_DIR of a CLI identity paired with this Gateway whose device
- * token is narrowed to `operator.read` (node.list) and `operator.write` (push.test). The plugin
- * holds no Gateway secret itself.
+ * token is narrowed to `operator.read` (node.list) and `operator.write` (push.test); see
+ * scripts/pair-cli-identity.mjs. The plugin holds no Gateway secret itself. The `agent_end` hook
+ * also needs `plugins.entries.ios-reply-alerts.hooks.allowConversationAccess: true`.
  *
  * The Gateway's node list carries no per-device owner, so the administrator must declare the one
  * person who owns every paired iPhone and iPad on this Gateway. Without that declaration the entry

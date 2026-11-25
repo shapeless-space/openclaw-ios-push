@@ -29,11 +29,12 @@ test("streaming, progress and tool events are not observed as completions", asyn
   t.after(() => h.dispose());
   await h.optIn();
 
+  await h.host.fireHook("agent_end", { runId: "r1" }, { runId: "r1", sessionKey: "agent:main:webchat:c", channel: "webchat", trigger: "user" });
   await h.host.emit({ runId: "r1", sessionKey: "agent:main:webchat:c", stream: "assistant", ts: 1, data: { delta: "partial" } });
   await h.host.emit({ runId: "r1", sessionKey: "agent:main:webchat:c", stream: "lifecycle", ts: 1, data: { phase: "start" } });
   await h.host.emit({ runId: "r1", sessionKey: "agent:main:webchat:c", stream: "tool", ts: 1, data: { phase: "end" } });
 
-  assert.deepEqual(h.host.waitCalls, []);
+  assert.deepEqual(h.host.entryLookups, []);
   assert.equal(h.transport.pushes.length, 0);
 });
 

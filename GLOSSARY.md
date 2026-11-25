@@ -17,7 +17,7 @@ The destination conversation currently visible to the person receiving a reply a
 _Avoid_: Connected client, open app
 
 **Native push target**:
-A paired node that the host classifies as the iOS app on an iPhone or iPad (platform "iOS …"/"iPadOS …"). Apple Watch, Mac and Android nodes are not targets.
+A paired node that the host classifies as the iOS app on an iPhone or iPad (platform "iOS …"/"iPadOS …"). Apple Watch, Mac and Android nodes are not targets, and neither is the iOS share extension, which pairs as its own node but advertises no commands.
 
 **Submission**:
 Handing one alert for one (logical run, device) key to the push transport. Accepted, rejected and unknown are submission outcomes; none of them is iPhone receipt.

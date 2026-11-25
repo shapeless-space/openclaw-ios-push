@@ -122,7 +122,7 @@
     },
     "owner.profileId": {
       "label": "Device owner profile",
-      "help": "The one person who owns every paired iPhone and iPad on this Gateway. Do not use on a Gateway where other people pair devices.",
+      "help": "The one person who owns every paired iPhone and iPad on this Gateway (see `openclaw users list`). Do not use on a Gateway where other people pair devices.",
       "advanced": false
     },
     "gateway.cliPath": {
@@ -138,12 +138,12 @@
     },
     "gateway.identityDir": {
       "label": "Plugin CLI identity",
-      "help": "State directory of a CLI identity paired with this Gateway and limited to operator.read and operator.write. Must be private and separate from the Gateway's own state directory.",
+      "help": "State directory of the plugin's own CLI identity, made with scripts/pair-cli-identity.mjs. It can only read and write, and must be separate from the Gateway's own state directory.",
       "advanced": true
     },
     "logEvidenceShape": {
       "label": "Log evidence field names",
-      "help": "Troubleshooting: after each finished run, log the names (never the values) of the fields the Gateway provided.",
+      "help": "Troubleshooting: log which run origin, status values and field names the Gateway provided for each finished run. Never message text or ids.",
       "advanced": true
     },
     "alert.content": {

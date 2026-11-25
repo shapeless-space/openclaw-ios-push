@@ -1,5 +1,6 @@
-// Opt-in from the iPhone or iPad itself: the device's own Gateway connection names the device,
-// so a settings toggle needs no device id and cannot switch another device.
+// Device opt-in. From the web Dashboard the owner lists their own iPhones and iPads and switches
+// one by id. From the device's own Gateway connection no id is needed, and it switches only itself.
+// Either way a device that is not the caller's reads as not found.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { FakeDevices, GENERIC, OWNER, PHONE, startHarness } from "./support/harness.ts";

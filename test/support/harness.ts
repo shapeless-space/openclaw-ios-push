@@ -11,6 +11,7 @@ import type { Device, DeviceDirectory, PushRequest, PushResult, PushTransport, V
 
 type Handler = (event: AgentEvent) => unknown;
 export type AgentEvent = { runId: string; sessionKey?: string; stream: string; ts: number; data: Record<string, unknown> };
+/** How a test describes a run's outcome; `completeRun` turns it into lifecycle end event data. */
 export type WaitResult = {
   status: "ok" | "error" | "timeout" | "pending";
   endedAt?: number;
@@ -48,9 +49,9 @@ export class FakeHost {
   subscriptions: { streams?: string[]; phases?: string[]; handle: Handler }[] = [];
   services: { start(): unknown; stop(): unknown }[] = [];
   methods = new Map<string, GatewayHandler>();
-  waits = new Map<string, WaitResult>();
   entries = new Map<string, SessionEntry>();
-  waitCalls: string[] = [];
+  /** Session keys the plugin looked up; only a settled run (both signals) triggers a lookup. */
+  entryLookups: string[] = [];
   /** Typed hooks registered with `api.on(name, handler)`. */
   hooks = new Map<string, ((event: unknown, ctx: Record<string, unknown>) => unknown)[]>();
   /** Lines the plugin wrote through the host's scoped `api.logger`. */
@@ -75,15 +76,9 @@ export class FakeHost {
         },
       },
       runtime: {
-        subagent: {
-          waitForRun: async ({ runId }: { runId: string; timeoutMs?: number }) => {
-            this.waitCalls.push(runId);
-            return this.waits.get(runId) ?? { status: "pending" };
-          },
-        },
         agent: {
           session: {
-            getSessionEntryAsync: async ({ sessionKey }: { sessionKey: string }) => this.entries.get(sessionKey),
+            getSessionEntryAsync: async ({ sessionKey }: { sessionKey: string }) => { this.entryLookups.push(sessionKey); return this.entries.get(sessionKey); },
           },
         },
       },

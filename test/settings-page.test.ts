@@ -1,4 +1,5 @@
-// The "Reply alerts" Control UI page, shown inside the iOS app's Settings on iPhone and iPad.
+// The "Reply alerts" Control UI page in the web Dashboard: one switch per iPhone or iPad of the
+// signed-in person. (The iOS app's Settings cannot show plugin pages.)
 // The browser module is driven with a fake Control UI host (its `request` is the Gateway RPC
 // seam) and a minimal fake DOM; it is never loaded into a real Control UI here.
 import { test } from "node:test";

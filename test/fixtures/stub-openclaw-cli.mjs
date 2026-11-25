@@ -1,5 +1,5 @@
-// Stub for `openclaw gateway call push.test`. Records what it was given (into $HOME) and answers
-// according to the requested node id. Never contacts a Gateway or APNs.
+// Stub for `openclaw gateway call push.test` and `node.list`. Records its argv and environment
+// (into $HOME) and answers by the requested node id. Never contacts a Gateway or APNs.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
