@@ -77,16 +77,18 @@ A profile id identifies a person on the Gateway.
 openclaw users list
 ```
 
-Find the profile your iPhone and iPad use. If your phone connects through Tailscale Serve, it is usually the long id, not `gateway-owner`. If you choose the wrong one, the Reply alerts page in step 7 says that no iPhone or iPad belongs to you. Then try the other profile.
+The list can show more than one profile for you. The iOS app signs in as a different profile depending on how it connects: through Tailscale Serve it is usually the long id, otherwise `gateway-owner`.
+
+Choose one of your profiles as the owner. Put your other profiles in `aliases` in step 5. If a profile is missing, the plugin logs `owner-has-no-devices` for conversations started under it.
 
 ### Step 5: Add the settings
 
-Replace the three paths and the profile id below with your own values. Write full paths, without `~`.
+Replace the three paths, the profile id and the aliases below with your own values. Write full paths, without `~`. If you have only one profile, write `"aliases": []`.
 
 ```sh
 openclaw config set plugins.entries.ios-reply-alerts.config '{
   "stateDir": "/Users/you/.openclaw/plugin-state/ios-reply-alerts/state",
-  "owner": { "profileId": "<your profile id>" },
+  "owner": { "profileId": "<your profile id>", "aliases": ["gateway-owner"] },
   "gateway": {
     "cliPath": "/path/to/node_modules/openclaw/openclaw.mjs",
     "url": "ws://127.0.0.1:18789",
@@ -151,7 +153,7 @@ The log contains only codes and field names, never message text.
 | --- | --- | --- |
 | `submitted-accepted` | Apple accepted the alert. | Check the notification settings on the device. |
 | `not-opted-in` | That device is switched off. | Switch it on (step 7). |
-| `owner-has-no-devices` | The conversation's owner has no iPhone or iPad on this Gateway. | Check the profile id (step 4). |
+| `owner-has-no-devices` | The conversation belongs to a profile that is not the owner or one of its aliases. | Add that profile to `aliases` (steps 4 and 5). |
 | `origin-missing` | OpenClaw did not tell the plugin where the turn came from. | Do step 6 again, then run `openclaw plugins reload ios-reply-alerts`. |
 | `ineligible-channel` | The turn came from Telegram or another chat channel. | Nothing. This is expected. |
 | `not-user-turn` | The turn came from a heartbeat, a scheduled job or a relayed message. | Nothing. This is expected. |

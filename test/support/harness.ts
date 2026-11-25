@@ -157,7 +157,7 @@ export class Clock {
 
 export type Harness = Awaited<ReturnType<typeof startHarness>>;
 
-export async function startHarness(options: { stateDir?: string; clock?: Clock; transport?: FakeTransport; devices?: FakeDevices; viewing?: FakeViewing; pushTimeoutMs?: number; declaredOwnerId?: string; joinTimeoutMs?: number; alertContent?: "generic" | "preview" } = {}) {
+export async function startHarness(options: { stateDir?: string; clock?: Clock; transport?: FakeTransport; devices?: FakeDevices; viewing?: FakeViewing; pushTimeoutMs?: number; declaredOwnerId?: string; joinTimeoutMs?: number; alertContent?: "generic" | "preview"; ownerAliases?: string[] } = {}) {
   const stateDir = options.stateDir ?? await mkdtemp(join(tmpdir(), "reply-alerts-"));
   const clock = options.clock ?? new Clock();
   const transport = options.transport ?? new FakeTransport();
@@ -174,6 +174,7 @@ export async function startHarness(options: { stateDir?: string; clock?: Clock; 
     ...(options.declaredOwnerId !== undefined ? { declaredOwnerId: options.declaredOwnerId } : {}),
     ...(options.joinTimeoutMs !== undefined ? { joinTimeoutMs: options.joinTimeoutMs } : {}),
     ...(options.alertContent !== undefined ? { alertContent: options.alertContent } : {}),
+    ...(options.ownerAliases !== undefined ? { ownerAliases: options.ownerAliases } : {}),
     diagnostics: (event) => { diagnostics.push(event); },
   });
   plugin.register(host.api());

@@ -36,6 +36,8 @@ export type PluginDeps = {
   joinTimeoutMs?: number;
   /** Single-owner Gateways: the person a session belongs to when the session records no owner. */
   declaredOwnerId?: string;
+  /** Other profiles of the declared owner (the iOS app signs in under different profiles per route). */
+  ownerAliases?: string[];
   /** "generic" (default): fixed text. "preview": session name and the start of the reply. */
   alertContent?: "generic" | "preview";
   diagnostics?: (event: Diagnostic) => void;
@@ -146,6 +148,10 @@ export function createReplyAlertsPlugin(deps: PluginDeps) {
         diagnostics: (event) => emit(event.code),
       });
       const joinTimeoutMs = deps.joinTimeoutMs ?? 120_000;
+      // One person, several profiles: an alias of the declared owner counts as the owner.
+      const aliases = new Set(deps.ownerAliases ?? []);
+      const canonical = (profileId: string | undefined) =>
+        profileId !== undefined && deps.declaredOwnerId !== undefined && aliases.has(profileId) ? deps.declaredOwnerId : profileId;
       const logShape = api.pluginConfig?.logEvidenceShape === true;
       const log = (line: string) => { if (logShape) { try { api.logger?.info?.(`ios-reply-alerts: ${line}`); } catch { /* best effort */ } } };
 
@@ -165,6 +171,7 @@ export function createReplyAlertsPlugin(deps: PluginDeps) {
         log(`facts ${describeFacts(p.terminal.data)}`);
         const run = toRunSettled(p.terminal, p.origin, entry, deps.declaredOwnerId);
         if (!run) { emit("evidence-incomplete"); return; }
+        run.ownerId = canonical(run.ownerId);
         if (deps.alertContent === "preview") run.alert = previewAlert(entry, p.terminal.data, ALERT);
         await feature.handleRunSettled(run);
       };
@@ -228,7 +235,7 @@ export function createReplyAlertsPlugin(deps: PluginDeps) {
           try {
             const p = asRecord(params);
             const deviceId = targetDevice(p, client);
-            result = deviceId === undefined ? { ok: false, error: "device-required" } : await run(client?.authenticatedUserProfile?.profileId, deviceId, p);
+            result = deviceId === undefined ? { ok: false, error: "device-required" } : await run(canonical(client?.authenticatedUserProfile?.profileId), deviceId, p);
           } catch { result = { ok: false, error: "feature-error" }; }
           answer(respond, result);
         };
@@ -238,7 +245,7 @@ export function createReplyAlertsPlugin(deps: PluginDeps) {
       api.registerGatewayMethod(DEVICES_LIST_METHOD, async ({ client, respond }: GatewayHandlerOptions) => {
         let result: MethodResult;
         try {
-          const listed = await feature.listDeviceOptIns(client?.authenticatedUserProfile?.profileId);
+          const listed = await feature.listDeviceOptIns(canonical(client?.authenticatedUserProfile?.profileId));
           const own = client?.connect?.device?.id;
           result = listed.ok ? { ok: true, devices: listed.devices.map((d) => ({ ...d, current: d.deviceId === own })) } : listed;
         } catch { result = { ok: false, error: "feature-error" }; }
@@ -278,6 +285,8 @@ export default {
       transport: createCliPushTransport(cli),
       devices: createCliDeviceDirectory({ ...cli, ownerId }),
       declaredOwnerId: ownerId,
+      ownerAliases: (Array.isArray(asRecord(api.pluginConfig?.owner).aliases) ? asRecord(api.pluginConfig?.owner).aliases as unknown[] : [])
+        .filter((a): a is string => typeof a === "string" && a !== "" && a !== ownerId),
       alertContent: asRecord(api.pluginConfig?.alert).content === "preview" ? "preview" : "generic",
     }).register(api);
   },

@@ -112,3 +112,28 @@ test("a thread the owner started under the main session alerts; spawned sessions
   assert.equal(h.transport.pushes.length, 1);
   assert.deepEqual(h.codes(), ["submitted-accepted", "child-run", "child-run", "child-run"]);
 });
+
+test("a session created under one of the owner's alias profiles alerts the owner's devices", async (t) => {
+  // Observed live: the iOS app signs in as the Tailscale-identity profile on one route and as
+  // `gateway-owner` on another, so one person's sessions carry either profile.
+  const h = await optedIn({ declaredOwnerId: OWNER, ownerAliases: ["gateway-owner"] });
+  t.after(() => h.dispose());
+
+  await h.completeRun({ sessionKey: "agent:main:ios-1", entry: { createdActor: { type: "human", source: "profile", id: "gateway-owner" }, parentSessionKey: "agent:main:main", createdVia: "operator", spawnDepth: 0 } });
+  await h.completeRun({ sessionKey: "s:stranger", entry: { createdActor: { type: "human", source: "profile", id: "profile:bob" } } });
+
+  assert.equal(h.transport.pushes.length, 1);
+  assert.deepEqual(h.codes(), ["submitted-accepted", "owner-has-no-devices"]);
+});
+
+test("the web Dashboard signed in under an alias profile lists and switches the owner's devices", async (t) => {
+  const h = await startHarness({ declaredOwnerId: OWNER, ownerAliases: ["gateway-owner"] });
+  t.after(() => h.dispose());
+  const asAlias = { profileId: "gateway-owner", deviceId: "browser:desktop" };
+
+  const listed = await h.host.call("replyAlerts.devices.list", {}, asAlias);
+  assert.deepEqual((listed.payload as { devices: { deviceId: string }[] }).devices.map((d) => d.deviceId), [PHONE]);
+  assert.equal((await h.host.call("replyAlerts.device.set", { deviceId: PHONE, enabled: true }, asAlias)).ok, true);
+  assert.equal((await h.host.call("replyAlerts.devices.list", {}, { profileId: "profile:bob" })).ok, true);
+  assert.deepEqual(((await h.host.call("replyAlerts.devices.list", {}, { profileId: "profile:bob" })).payload as { devices: unknown[] }).devices, []);
+});

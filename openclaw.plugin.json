@@ -33,6 +33,14 @@
           "profileId": {
             "type": "string",
             "minLength": 1
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
           }
         }
       },
@@ -149,6 +157,11 @@
     "alert.content": {
       "label": "Alert content",
       "help": "generic: \"Your reply is ready.\" preview: the conversation's name and the start of the reply. Previews appear on the lock screen and pass through Apple's push service.",
+      "advanced": false
+    },
+    "owner.aliases": {
+      "label": "Other profiles of the owner",
+      "help": "Profiles that are the same person as the device owner, for example gateway-owner. The iOS app can sign in under different profiles depending on how it connects.",
       "advanced": false
     }
   }
